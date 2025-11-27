@@ -36,18 +36,58 @@ while True:
         print("Please enter a valid number.")
 
 
+print("\n--- Tax Relief Information ---")
+print("Tax relief helps reduce your taxable income based on your personal situation.")
+print("1. RM9000 for self (basic individual relief).")
+print("2. RM4000 for spouse (if spouse income < RM4000).")
+print("3. RM2000 per child.")
+print("4. Up to RM8000 for medical expenses.")
+print("5. Up to RM2500 for lifestyle expenses.")
+print("6. Up to RM7000 for education fees.")
+print("7. Up to RM5000 for parental care.")
+
+
+print("\n--- Please enter information for tax relief calculation ---")
 while True:
     try:
-        tax_relief = float(input("Enter your total tax relief (RM): "))
-        if tax_relief < 0:
-            raise ValueError
+        spouse_income = float(input("Spouse income (RM, enter 0 if no income): "))
+        num_children = int(input("Number of children: "))
+        medical_expenses = float(input("Medical expenses (RM): "))
+        lifestyle_expenses = float(input("Lifestyle expenses (RM): "))
+        education_fees = float(input("Education fees (RM): "))
+        parental_care = float(input("Parental care expenses (RM): "))
         break
     except ValueError:
-        print("Please enter a valid number.")
+        print("Invalid input. Please enter numbers only.")
 
 
+relief_details = functions.calculate_tax_relief(
+    spouse_income, num_children, medical_expenses,
+    lifestyle_expenses, education_fees, parental_care
+)
+tax_relief = relief_details["total_relief"]
+
+
+print("\n================ TAX RELIEF BREAKDOWN ================\n")
+print(f"Individual Relief (Fixed): RM {relief_details['self_relief']}")
+print(f"Spouse Relief: RM {relief_details['spouse_relief']}")
+print(f"Children Relief: RM {relief_details['children_relief']}")
+print(f"Medical Relief: RM {relief_details['medical_relief']}")
+print(f"Lifestyle Relief: RM {relief_details['lifestyle_relief']}")
+print(f"Education Fees Relief: RM {relief_details['education_relief']}")
+print(f"Parental Care Relief: RM {relief_details['parental_relief']}")
+print("------------------------------------------------------")
+print(f"Total Tax Relief: RM {relief_details['total_relief']}")
+print("======================================================\n")
+
+
+taxable_income = max(0, income - tax_relief)
 tax_payable = functions.calculate_tax(income, tax_relief)
-print(f"\nYour tax payable is: RM {tax_payable}")
+
+if taxable_income == 0:
+    print("Your income is fully covered by tax relief. No tax payable.\n")
+else:
+    print(f"Your tax payable is: RM {tax_payable}\n")
 
 
 data = [ic_number, income, tax_relief, tax_payable]
