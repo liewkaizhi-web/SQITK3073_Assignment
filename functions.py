@@ -1,4 +1,3 @@
-
 import pandas as pd
 import os
 
@@ -30,19 +29,37 @@ def calculate_tax_relief(spouse_income, num_children, medical_expenses,
     }
 
 def calculate_tax(income, relief):
+
     taxable_income = max(0, income - relief)
     if taxable_income == 0:
         return 0
-    if taxable_income <= 5000:
-        return taxable_income * 0.01
-    elif taxable_income <= 20000:
-        return 5000*0.01 + (taxable_income-5000)*0.03
-    elif taxable_income <= 35000:
-        return 5000*0.01 + 15000*0.03 + (taxable_income-20000)*0.08
-    elif taxable_income <= 50000:
-        return 5000*0.01 + 15000*0.03 + 15000*0.08 + (taxable_income-35000)*0.14
-    else:
-        return 5000*0.01 + 15000*0.03 + 15000*0.08 + 15000*0.14 + (taxable_income-50000)*0.21
+
+    brackets = [
+    (5000, 0),
+    (20000, 0.01),
+    (35000, 0.03),
+    (50000, 0.06),
+    (70000, 0.11),
+    (100000, 0.19),
+    (400000, 0.25),
+    (600000, 0.26),
+    (2000000, 0.28),
+    (float('inf'), 0.30)
+]
+
+
+    tax = 0
+    lower = 0
+    for upper, rate in brackets:
+        if taxable_income > upper:
+            tax += (upper - lower) * rate
+            lower = upper
+        else:
+            tax += (taxable_income - lower) * rate
+            break
+
+    return round(tax, 2)
+
 
 def save_to_csv(data, filename):
     df = pd.DataFrame([data], columns=['IC', 'Income', 'Tax Relief', 'Tax Payable'])
